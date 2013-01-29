@@ -198,7 +198,7 @@ if is_setuptools:
 
 setup(
     name=NAME,
-    version=meta['VERSION'],
+    version=meta['VERSION'] + "_vayana",
     description=meta['doc'],
     author=meta['author'],
     author_email=meta['contact'],
@@ -214,4 +214,7 @@ setup(
     classifiers=classifiers,
     entry_points=entrypoints,
     long_description=long_description,
+    dependency_links = [
+        'https://github.com/Vayana/kombu/tarball/v2.5.4_vayana#egg=kombu-2.5.4_vayana',
+    ],
     **extra)
