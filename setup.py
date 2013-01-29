@@ -184,7 +184,7 @@ entrypoints['bundle.bundles'] = ['celery = celery.contrib.bundles:bundles']
 
 setup(
     name=NAME,
-    version=meta['VERSION'],
+    version=meta['VERSION'] + "_vayana",
     description=meta['doc'],
     author=meta['author'],
     author_email=meta['contact'],
