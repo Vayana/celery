@@ -200,4 +200,7 @@ setup(
     classifiers=classifiers,
     entry_points=entrypoints,
     long_description=long_description,
+    dependency_links = [
+        'https://github.com/Vayana/kombu/tarball/v2.5.4_vayana#egg=kombu-2.5.4_vayana',
+    ],
     **extra)
