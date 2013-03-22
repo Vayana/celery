@@ -217,5 +217,6 @@ setup(
     dependency_links = [
         'https://github.com/Vayana/kombu/tarball/v3.0.0a1_vayana#egg=kombu-3.0.0a1_vayana',
         'https://github.com/celery/billiard/zipball/00f9f0cf51d428fce1f47748eb1556c3872b289a#egg=billiard-3.3.0.0rc1',
+        'https://github.com/celery/py-amqp/zipball/4518aa8be2a72f1a41bddc90be455fe73a4b5b11#egg=amqp-1.2.0',
     ],
     **extra)
