@@ -215,6 +215,7 @@ setup(
     entry_points=entrypoints,
     long_description=long_description,
     dependency_links = [
-        'https://github.com/Vayana/kombu/tarball/v2.5.4_vayana#egg=kombu-2.5.4_vayana',
+        'https://github.com/Vayana/kombu/tarball/v3.0.0a1_vayana#egg=kombu-3.0.0a1_vayana',
+        'https://github.com/celery/billiard/zipball/00f9f0cf51d428fce1f47748eb1556c3872b289a#egg=billiard-3.3.0.0rc1',
     ],
     **extra)

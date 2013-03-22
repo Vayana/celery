@@ -24,22 +24,6 @@ from .exceptions import IncompleteStream, TimeoutError
 from .five import items, map, range, string_t
 
 
-def from_serializable(r):
-    # earlier backends may just pickle, so check if
-    # result is already prepared.
-    if not isinstance(r, ResultBase):
-        id = parent = None
-        res, nodes = r
-        if nodes:
-            return GroupResult(
-                res, [from_serializable(child) for child in nodes],
-            )
-        if isinstance(res, (list, tuple)):
-            id, parent = res[0], res[1]
-        return AsyncResult(id, parent=parent)
-    return r
-
-
 class ResultBase(object):
     """Base class for all results"""
 
@@ -214,7 +198,7 @@ class AsyncResult(ResultBase):
 
     def __str__(self):
         """`str(self) -> self.id`"""
-        return self.id
+        return str(self.id)
 
     def __hash__(self):
         """`hash(self) -> hash(self.id)`"""
@@ -528,6 +512,8 @@ class ResultSet(ResultBase):
         result backends.
 
         """
+        if not self.results:
+            return iter([])
         backend = self.results[0].backend
         ids = [result.id for result in self.results]
         return backend.get_many(ids, timeout=timeout, interval=interval)
@@ -548,8 +534,15 @@ class ResultSet(ResultBase):
         acc = [None for _ in range(len(self))]
         for task_id, meta in self.iter_native(timeout=timeout,
                                               interval=interval):
+            if propagate and meta['status'] in states.PROPAGATE_STATES:
+                raise meta['result']
             acc[results.index(task_id)] = meta['result']
         return acc
+
+    def _failed_join_report(self):
+        return (res for res in self.results
+                if res.backend.is_cached(res.id) and
+                res.state in states.PROPAGATE_STATES)
 
     def __len__(self):
         return len(self.results)
@@ -729,3 +722,19 @@ class EagerResult(AsyncResult):
     @property
     def supports_native_join(self):
         return False
+
+
+def from_serializable(r, Result=AsyncResult):
+    # earlier backends may just pickle, so check if
+    # result is already prepared.
+    if not isinstance(r, ResultBase):
+        id = parent = None
+        res, nodes = r
+        if nodes:
+            return GroupResult(
+                res, [from_serializable(child, Result) for child in nodes],
+            )
+        if isinstance(res, (list, tuple)):
+            id, parent = res[0], res[1]
+        return Result(id, parent=parent)
+    return r

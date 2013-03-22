@@ -1133,6 +1133,7 @@ class test_WorkController(AppCase):
 
     def test_Pool_crate_threaded(self):
         w = Mock()
+        w._conninfo.connection_errors = w._conninfo.channel_errors = ()
         w.pool_cls = Mock()
         w.use_eventloop = False
         pool = components.Pool(w)
@@ -1141,12 +1142,14 @@ class test_WorkController(AppCase):
     def test_Pool_create(self):
         from celery.worker.hub import BoundedSemaphore
         w = Mock()
+        w._conninfo.connection_errors = w._conninfo.channel_errors = ()
         w.hub = Mock()
         w.hub.on_init = []
         w.pool_cls = Mock()
         P = w.pool_cls.return_value = Mock()
         P.timers = {Mock(): 30}
         w.use_eventloop = True
+        w.consumer.restart_count = -1
         pool = components.Pool(w)
         pool.create(w)
         self.assertIsInstance(w.semaphore, BoundedSemaphore)
@@ -1180,6 +1183,7 @@ class test_WorkController(AppCase):
         cbs['on_timeout_set'](result, None, 10)
         cbs['on_timeout_set'](result, None, None)
 
-        P.did_start_ok.return_value = False
         with self.assertRaises(WorkerLostError):
-            pool.on_poll_init(P, hub)
+            P.did_start_ok.return_value = False
+            w.consumer.restart_count = 0
+            pool.on_poll_init(P, w, hub)

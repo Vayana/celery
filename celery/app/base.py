@@ -18,7 +18,6 @@ from copy import deepcopy
 from functools import wraps
 from operator import attrgetter
 
-from billiard import forking as _forking
 from billiard.util import register_after_fork
 from kombu.clocks import LamportClock
 from kombu.utils import cached_property
@@ -193,8 +192,6 @@ class Celery(object):
 
     def _task_from_fun(self, fun, **options):
         base = options.pop('base', None) or self.Task
-
-        print('%r base is: %r' % (fun, base, ))
 
         T = type(fun.__name__, (base, ), dict({
             'app': self,
